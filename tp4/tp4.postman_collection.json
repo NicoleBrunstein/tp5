@@ -1,0 +1,138 @@
+{
+	"info": {
+		"_postman_id": "410f6a23-0fe5-4395-b0b9-d2381ae280d3",
+		"name": "tp4",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34141556"
+	},
+	"item": [
+		{
+			"name": "getAll",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/provinces",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"provinces"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getById",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/provinces/6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"provinces",
+						"6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "insert",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \r\n    \"name\": \"Buenos Aires prueba\",\r\n    \"full_name\": \"Provincia de Buenos Aires\",\r\n    \"latitude\": \"-36.677391052246094\",\r\n    \"longitude\": \"-60.558475494384766\",\r\n    \"display_order\": null\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/provinces",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"provinces"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "modificar",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \r\n    \"name\": \"Buenos Aires prueba\",\r\n    \"full_name\": \"Provincia de Buenos Aires\",\r\n    \"latitude\": \"-36.677391052246094\",\r\n    \"longitude\": \"-60.558475494384766\",\r\n    \"display_order\": null\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/provinces",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"provinces"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "eliminar",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \r\n    \"name\": \"Buenos Aires prueba\",\r\n    \"full_name\": \"Provincia de Buenos Aires\",\r\n    \"latitude\": \"-36.677391052246094\",\r\n    \"longitude\": \"-60.558475494384766\",\r\n    \"display_order\": null\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/provinces",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"provinces"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
