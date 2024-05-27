@@ -42,18 +42,28 @@ export default class event_enrollmentsRepository
         const client = new Client(DBConfig);
         await client.connect();
         let returnEntity = null;
+        let  sql = `SELECt * FROM public.event_enrollments
+        INNER JOIN public.users ON event_enrollments.id_User = users.Id`;
+        if(last_name != null ){
+            sql  =  sql + `WHERE lower(users.last_name) like lower('%' + last_name + '%')`;
+        }
 
-
-        let  sql = `SELECT * FROM event_enrollments`;
-        sql  =  sql + `AND firsnamt=asdasd`;
-
-
-
-        sql  =  sql + `AND latsName=asdasd`;
-
-
-        const sql = `SELECT * FROM event_enrollments WHERE last_name = $1`;
+        if(first_name != null ){
+            sql  =  sql + `AND  lower(users.first_name) like lower('%' + first_name + '%')`;
+        }
         
+        if(attended != null ){
+            sql  =  sql + `AND   event_enrollments.attended = 'attended'`;
+        }
+
+        if(rating != null ){
+            sql  =  sql + `AND event_enrollments.rating = 'rating'`;
+        }
+
+
+
+        
+
         const values = [last_name]
         const result = await client.query(sql, values);
         if (result.rows.length > 0){
