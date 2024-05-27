@@ -23,6 +23,29 @@ export default class event_enrollmentsRepository
 
         return rowsAffected;
     }
+
+    getByIdAsync = async (id) => {
+        const client = new Client(DBConfig);
+        await client.connect();
+        let returnEntity = null;
+        const sql = `SELECT * FROM event_categories WHERE id = $1`;
+        const values = [id]
+        const result = await client.query(sql, values);
+        if (result.rows.length > 0){
+            returnEntity = result.rows[0];
+        }
+        return  returnEntity;
+    }
+
+    deleteByIdAsync = async (id) => {
+        let  rowsAffected;
+        const client = new Client(DBConfig);
+        await client.connect();
+        const sql = 'DELETE FROM event_enrollments WHERE id=$1';
+        const values = [id]
+        const result = await client.query(sql, values);
+        rowsAffected = result.affectedRows;
+    }
     
 }
 
