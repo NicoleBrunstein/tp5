@@ -50,6 +50,7 @@ export default class event_categoriesRepository
         return rowsAffected;
 
     }
+    
     updateAsync = async (entity) => {
         const client = new Client(DBConfig);
         await client.connect();
@@ -60,6 +61,7 @@ export default class event_categoriesRepository
             rowsAffected = result.affectedRows;
             return rowsAffected;
     }
+    
     deleteByIdAsync = async (id) => {
         let  rowsAffected;
         const client = new Client(DBConfig);

@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {jwt} from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { StatusCodes } from 'http-status-codes';
 import UsersService from './../services/users-service.js'
 const router = Router();
@@ -23,20 +23,27 @@ router.post('/login', async (req, res) => {
             id: entity.id,
             username:entity.username
         };
-        const secretkey = 'clavesecreta2006';
+        const secretKey = 'clavesecreta2006';
         const options ={
             expiresIn: '1h',
-            issure:'mi_organizacion'
-        }
-        let miToken = jwt.sing(payload,secretkey,options);
+            issuer:'mi_organizacion'
+        };
+        const token = jwt.sign(payload,secretKey,options);
+        console.log(token);
 
         respuesta = {
             "success": true,
             "message": "",
-            "token"  : miToken
+            "token"  : token
         }
     }
     return res.status(200).json(respuesta);
 });
 
+router.post('/register', async (req, res) => {
+    let entity=req.body;
+
+    const registrosAfectados = await svc.createAsync(entity);
+    return res.status(200).json(registrosAfectados);
+});
 export default router;
