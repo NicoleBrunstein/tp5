@@ -16,6 +16,22 @@ router.delete('/:id', async (req, res) => {
     return respuesta = res.status(200).json(returnEntity);
 });
 
+router.get('/:id/enrollment', async (req, res) => {
+    let respuesta;
+    const first_name      = req.query.first_name;
+    const last_name  =  req.query.last_name;
+    const attended  =  req.query.attended;
+    const rating  =  req.query.rating;
+  
+    const returnArray = await svc.getByLastName(first_name, last_name, attended, rating);
+    if (returnArray != null){
+      respuesta = res.status(200).json(returnArray);
+    } else {
+      respuesta = res.status(404).send(`not found`);
+    }
+    return respuesta;
+  });
+
 export default router;
 
 

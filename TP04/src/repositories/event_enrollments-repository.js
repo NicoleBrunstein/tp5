@@ -24,50 +24,44 @@ export default class event_enrollmentsRepository
         return rowsAffected;
     }
 
-    getByName = async (id, first_name) => {
+    getByLastName = async (first_name, last_name, attended, rating) => {
         const client = new Client(DBConfig);
         await client.connect();
         let returnEntity = null;
-        const sql = `SELECT * FROM event_enrollments WHERE first_name = $1`;
-        const values = [first_name]
-        const result = await client.query(sql, values);
-        if (result.rows.length > 0){
-            returnEntity = result.rows[0];
-        }
-        return  returnEntity;
-    }
-
-    
-    getByLastName = async (id, last_name) => {
-        const client = new Client(DBConfig);
-        await client.connect();
-        let returnEntity = null;
+        let values = [];
+        let indice;
+        
         let  sql = `SELECt * FROM public.event_enrollments
-        INNER JOIN public.users ON event_enrollments.id_User = users.Id`;
+        INNER JOIN public.users ON event_enrollments.id_User = users.Id
+        where 1=1`;
         if(last_name != null ){
-            sql  =  sql + `WHERE lower(users.last_name) like lower('%' + last_name + '%')`;
+            indice = values.length + 1;
+            sql  =  sql + `AND lower(users.last_name) like $${indice}`;
+            values.push("%" + last_name.toLowerCase()+ "%");
         }
 
         if(first_name != null ){
-            sql  =  sql + `AND  lower(users.first_name) like lower('%' + first_name + '%')`;
+            indice = values.length + 1;
+            sql  =  sql + `AND  lower(users.first_name) like $${indice}`;
+            values.push("%" + first_name.toLowerCase()+ "%");
+
         }
         
         if(attended != null ){
+            
             sql  =  sql + `AND   event_enrollments.attended = 'attended'`;
+           
         }
 
         if(rating != null ){
+           
             sql  =  sql + `AND event_enrollments.rating = 'rating'`;
+            
+
         }
-
-
-
-        
-
-        const values = [last_name]
         const result = await client.query(sql, values);
         if (result.rows.length > 0){
-            returnEntity = result.rows[0];
+            returnEntity = result.rows;
         }
         return  returnEntity;
     }

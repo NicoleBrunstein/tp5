@@ -5,8 +5,8 @@ const {Client, Pool}=pkg;
 export default class eventsRepository
 {
 
-    /*
-    getAllAsync = async (name, category) => {
+    
+    getAllAsync = async () => {
         let returnArray = null;
         const client = new Client(DBConfig);
         try {
@@ -21,8 +21,8 @@ export default class eventsRepository
         return returnArray;
     }
 
-    */
-    getAllAsync = async (name, category, tags, startDate) => {
+    
+    getByAsync = async (name, category, tags, startDate) => {
         const client = new Client(DBConfig);
         await client.connect();
         let returnEntity = null;
@@ -33,39 +33,40 @@ export default class eventsRepository
         LEFT JOIN public.event_tags ON events.id = event_tags.id_event
         LEFT JOIN public.tags on event_tags.id_tag = tags.id
         WHERE 1=1 `;
-
         
 
         if(name != null ){
             indice = values.length + 1;
-            sql  =  sql + `AND lower(events.name) like lower('%$${indice}%')`;
-            values.push(name);
+            sql  =  sql + `AND lower(events.name) like $${indice}`;
+            values.push("%" + name.toLowerCase()+ "%");
         }
          
         if(category != null ){
             indice = values.length + 1;
-            sql  =  sql + `AND lower(event_categories.name) like lower('%$${indice}%')`;
-            values.push(category);
+            sql  =  sql + `AND lower(event_categories.name) like $${indice}`;
+            values.push("%" + category.toLowerCase()+ "%");
         }
 
 
         if(tags != null ){
             indice = values.length + 1;
-            sql  =  sql + `AND lower(tags.name) like lower('%$${indice}%')`;
-            values.push(tags);
+            sql  =  sql + `AND lower(tags.name) like $${indice}`;
+            values.push("%" + tags.toLowerCase()+ "%");
         }
        
 
         if(startDate != null ){
             indice = values.length + 1;
-            sql  =  sql + `AND events.start_date = '${indice}'`;
-            values.push(startDate);
+            sql  =  sql + `AND events.start_date = $${indice}`;
+            values.push("%" + startDate.toLowerCase()+ "%");
         }
          
-
+        console.log(sql)
+        console.log('values', values)
+        console.log('indice', indice)
         const result = await client.query(sql, values);
         if (result.rows.length > 0){
-            returnEntity = result.rows[0];
+            returnEntity = result.rows;
         }
         return  returnEntity;
     }

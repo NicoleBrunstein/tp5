@@ -2,9 +2,16 @@ import eventsRepository from "../repositories/events-repository.js";
 
 export default class eventsService {
   // Clase con lógica de negocio.
-  getAllAsync = async (name, category, tags,startDate) => {
+  getAllAsync = async () => {
     const repo = new eventsRepository();
-    const returnArray = await repo.getAllAsync(name, category, tags,startDate);
+    const returnArray = await repo.getAllAsync();
+    return returnArray;
+  }
+ 
+
+  getByAsync = async (name, category, tags,startDate) => {
+    const repo = new eventsRepository();
+    const returnArray = await repo.getByAsync(name, category, tags,startDate);
     return returnArray;
   }
  
@@ -19,10 +26,6 @@ export default class eventsService {
     const returnrowsAffected = await repo.createAsync(entity);
     return returnrowsAffected;
   }
-  getByInfo = async (entity) => {
-    const repo = new eventsRepository();
-    const returnrowsAffected = await repo.getByInfo(entity);
-    return returnrowsAffected;
-  }
+  
  
 }
