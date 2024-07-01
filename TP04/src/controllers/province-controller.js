@@ -21,10 +21,11 @@ router.get('/:id', async (req, res) => {
     if (returnEntity != null){
         respuesta = res.status(200).json(returnEntity);
       } else {
-        respuesta = res.status(500).send(`Error interno.`);
+        respuesta = res.status(404).send(`not found.`);
       }
       return respuesta;
 });
+
 router.post('', async (req, res) => {
     let entity=req.body;
     const registrosAfectados = await svc.createAsync(entity);

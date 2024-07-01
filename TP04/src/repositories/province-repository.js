@@ -31,6 +31,8 @@ export default class ProvinceRepository
         }
         return  returnEntity;
     }
+
+
     createAsync = async (entity) => {
         console.log('ProvinceRepository.createAsync(${JSON.stringify(entity)})');
         const client = new Client(DBConfig);
