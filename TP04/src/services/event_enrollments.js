@@ -1,4 +1,4 @@
-import event_enrollmentsRepository from '../repositories/event_enrollments-repository';
+import event_enrollmentsRepository from '../repositories/event_enrollments-repository.js';
 
 export default class event_enrollamentsRepository {
   // Clase con lógica de negocio.
@@ -15,9 +15,9 @@ export default class event_enrollamentsRepository {
     return returnrowsAffected;
   }
 
-  getByLastName = async (first_name, last_name, attended, rating) => {
-    const repo = new eventsRepository();
-    const returnArray = await repo.getByLastName(first_name, last_name, attended, rating);
+  getByLastName = async (id, first_name, last_name,username, attended, rating) => {
+    const repo = new event_enrollmentsRepository();
+    const returnArray = await repo.getByLastName(id, first_name, last_name,username, attended, rating);
     return returnArray;
   }
 }

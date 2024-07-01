@@ -19,7 +19,7 @@ app.use('/api/provinces', ProvinceController);
 //app.use('/api/locations', locationRouter);
 app.use('/api/user', userController);
 app.use('/api/event', eventsController);
-app.use('/api/event_enrollments', enrollmentsControler);
+app.use('/api/event', enrollmentsControler);
 
 
 app.listen(port, () => {

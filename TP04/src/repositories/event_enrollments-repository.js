@@ -24,7 +24,7 @@ export default class event_enrollmentsRepository
         return rowsAffected;
     }
 
-    getByLastName = async (first_name, last_name, attended, rating) => {
+    getByLastName = async (id,first_name, last_name,username, attended, rating) => {
         const client = new Client(DBConfig);
         await client.connect();
         let returnEntity = null;
@@ -34,31 +34,39 @@ export default class event_enrollmentsRepository
         let  sql = `SELECt * FROM public.event_enrollments
         INNER JOIN public.users ON event_enrollments.id_User = users.Id
         where 1=1`;
+
+        if(id != null ){
+            sql  =  sql + ` AND   event_enrollments.id_event = '${id}'`;
+        }
+
+
         if(last_name != null ){
             indice = values.length + 1;
-            sql  =  sql + `AND lower(users.last_name) like $${indice}`;
+            sql  =  sql + ` AND lower(users.last_name) like $${indice}`;
             values.push("%" + last_name.toLowerCase()+ "%");
         }
 
         if(first_name != null ){
             indice = values.length + 1;
-            sql  =  sql + `AND  lower(users.first_name) like $${indice}`;
+            sql  =  sql + ` AND  lower(users.first_name) like $${indice}`;
             values.push("%" + first_name.toLowerCase()+ "%");
+        }
 
+        if(username != null ){
+            indice = values.length + 1;
+            sql  =  sql + ` AND  lower(users.username) like $${indice}`;
+            values.push("%" + username.toLowerCase()+ "%");
         }
         
         if(attended != null ){
-            
-            sql  =  sql + `AND   event_enrollments.attended = 'attended'`;
-           
+            sql  =  sql + ` AND   event_enrollments.attended = '${attended}'`;
         }
 
         if(rating != null ){
-           
-            sql  =  sql + `AND event_enrollments.rating = 'rating'`;
-            
-
+            sql  =  sql + ` AND event_enrollments.rating = 'rating'`;
         }
+
+        console.log("XXXX",sql )
         const result = await client.query(sql, values);
         if (result.rows.length > 0){
             returnEntity = result.rows;

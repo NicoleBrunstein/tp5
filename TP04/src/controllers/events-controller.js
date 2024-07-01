@@ -21,6 +21,8 @@ router.get('', async (req, res) => {
   const category  =  req.query.category;
   const tags  =  req.query.tags;
   const startDate  =  req.query.startDate;
+
+  req.headers.authorization
 console.log("name:", name)
   const returnArray = await svc.getByAsync(name, category, tags, startDate);
   if (returnArray != null){

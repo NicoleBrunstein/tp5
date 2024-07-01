@@ -10,14 +10,19 @@ router.post('/login', async (req, res) => {
     let entity=req.body;
     let respuesta;
     console.log('Controller: ', entity);
-
+    var validEmail =  /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
     const usuario  = await svc.getByUsername(entity);
+   if(usuario==validEmail)
+   {
+    
+   }
     if (usuario == null){
         respuesta = {
             "success": false,
             "message": "El email es invalido.",
             "token"  : ""
         }
+        return res.status(404).json(respuesta);
     } else {
         const payload = {
             id: entity.id,
@@ -44,6 +49,7 @@ router.post('/register', async (req, res) => {
     let entity=req.body;
 
     const registrosAfectados = await svc.createAsync(entity);
-    return res.status(200).json(registrosAfectados);
+    return res.status(201).json(registrosAfectados);
 });
 export default router;
+
