@@ -32,6 +32,19 @@ export default class ProvinceRepository
         return  returnEntity;
     }
 
+    getByProvince = async (id) => {
+        const client = new Client(DBConfig);
+        await client.connect();
+        let returnEntity = null;
+        const sql = `SELECT * FROM locations WHERE id_province = $1`;
+        const values = [id]
+        const result = await client.query(sql, values);
+        if (result.rows.length > 0){
+            returnEntity = result.rows[0];
+        }
+        return  returnEntity;
+    }
+
 
     createAsync = async (entity) => {
         console.log('ProvinceRepository.createAsync(${JSON.stringify(entity)})');

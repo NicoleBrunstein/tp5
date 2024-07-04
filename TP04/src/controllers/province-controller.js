@@ -26,6 +26,18 @@ router.get('/:id', async (req, res) => {
       return respuesta;
 });
 
+router.get('/:id', async (req, res) => {
+  let respuesta;
+  let id = req.params.id;
+  const returnEntity = await svc.getByProvince(id);
+  if (returnEntity != null){
+      respuesta = res.status(200).json(returnEntity);
+    } else {
+      respuesta = res.status(404).send(`not found.`);
+    }
+    return respuesta;
+});
+
 router.post('', async (req, res) => {
     let entity=req.body;
     const registrosAfectados = await svc.createAsync(entity);

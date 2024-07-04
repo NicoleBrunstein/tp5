@@ -25,6 +25,7 @@ router.get('/:id', async (req, res) => {
       }
       return respuesta;
 });
+
 router.post('', async (req, res) => {
     let entity=req.body;
     const registrosAfectados = await svc.createAsync(entity);
