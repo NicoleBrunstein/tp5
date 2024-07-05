@@ -1,4 +1,4 @@
-import event_locationsRepository from "../repositories/event_locations-repositry";
+import event_locationsRepository from "../repositories/event_locations-repositry.js";
 
 export default class event_locationService {
   // Clase con lógica de negocio.
@@ -9,7 +9,7 @@ export default class event_locationService {
   }
  
   getByIdAsync = async (id) => {
-    const repo = new event_locationRepository();
+    const repo = new event_locationsRepository();
     const returnEntity = await repo.getByIdAsync(id);
     return returnEntity;
 

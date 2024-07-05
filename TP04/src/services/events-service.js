@@ -27,5 +27,27 @@ export default class eventsService {
     return returnrowsAffected;
   }
   
- 
+  updateAsync = async (entity) => {
+    const repo = new eventsRepository();
+    const returnArray = await repo.updateAsync(entity);
+    return returnArray;
+  }
+
+  deleteAsync = async (id) => {
+    const repo = new eventsRepository();
+    const returnArray = await repo.deleteAsync(id);
+    return returnArray;
+  }
+
+  registrationAsync = async (id) => {
+    const repo = new EventRepository();
+    const registeredUsers = await repo.registrationAsync(id);
+    return registeredUsers;
+  }
+
+   ifAlreadyRegistered = async (id) => {
+    const repo = new EventRepository();
+    const returnArray = await repo.ifAlreadyRegistered(id);
+    return returnArray;
+  }
 }
