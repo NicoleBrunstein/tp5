@@ -26,7 +26,7 @@ router.get('/:id', async (req, res) => {
       return respuesta;
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id/locations', async (req, res) => {
   let respuesta;
   let id = req.params.id;
   const returnEntity = await svc.getByProvince(id);

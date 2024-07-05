@@ -14,7 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 
-app.use('/api/provinces', ProvinceController);
+app.use('/api/province', ProvinceController);
 app.use('/api/event_categories', event_categoriesRouter);
 app.use('/api/locations', locationRouter);
 app.use('/api/user', userController);

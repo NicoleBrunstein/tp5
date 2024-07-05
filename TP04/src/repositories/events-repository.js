@@ -93,6 +93,7 @@ export default class eventsRepository
             const sql = 'INSERT INTO event_enrollments(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)';
             const values = [entity.name, entity.description, entity.id_event_category, entity.id_event_location, entity.start_date, entity.duration_in_minutes, entity.price, entity.enabled_for_enrollment, entity.max_assistance, entity.id_creator_user];
             const result = await client.query(sql, values);
+            await client.end();
             rowsAffected = result.affectedRows;
         }catch (error){
             
@@ -103,8 +104,63 @@ export default class eventsRepository
 
     }
 
-   
-
+    updateAsync = async(entity) => {
+        let returnArray = null;
+        const client = new Client(DBConfig);
+        try {
+          await client.connect();
+          const sql = `UPDATE events SET name = $1, description = $2, id_event_category = $3, id_event_location = $4, start_date = $5, duration_in_minutes = $6, price = $7, enabled_for_enrollment = $8, max_assistance = $9, id_creator_user = $10 WHERE id = $11;`;
+          const values = [entity.name, entity.description, entity.id_event_category, entity.id_event_location, entity.start_date, entity.duration_in_minutes, entity.price, entity.enabled_for_enrollment ? '1': '0', entity.max_assistance, entity.id_creator_user, entity.id]
+          console.log("Executing SQL:", sql);
+          console.log("With values:", values);
+          const result = await client.query(sql, values);
+          await client.end();
+          returnArray = result.rows
+        } catch (error) {
+          console.log("Error in updateAsync:", error);
+        }
     
+        return returnArray;
+      }
+    
+      deleteAsync = async(id) => {
+        let returnArray = null;
+        const client = new Client(DBConfig);
+    
+        try {
+          await client.connect();
+          const sql = "DELETE FROM events WHERE id = $1";
+          const values = [id];
+          console.log("Executing SQL:", sql);
+          console.log("With values:", values);
+    
+          const result = await client.query(sql, values);
+          await client.end();
+          returnArray = result.rows;
+        } catch (error) {
+          console.log("Error in deleteAsync:", error);
+        }
+    
+        return returnArray;
+      }
 
+      registrationAsync = async(id) => {
+        let returnArray = null;
+        const client = new Client(DBConfig);
+    
+        try {
+          await client.connect();
+          const sql = "SELECT COUNT(*) FROM event_enrollments WHERE id_event = $1;";
+          const values = [id];
+          console.log("Executing SQL:", sql);
+          console.log("With values:", values);
+    
+          const result = await client.query(sql, values);
+          await client.end();
+          returnArray = result.rows[0].count > 0;
+        } catch (error) {
+          console.log("Error in registrationAsync:", error);
+        }
+        return returnArray;
+    }
 }
