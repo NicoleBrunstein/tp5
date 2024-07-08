@@ -14,5 +14,12 @@ export default class locationService {
     return returnEntity;
 
   }
+
+  getByLocation = async (id) => {
+    const repo = new locationRepository();
+    const returnEntity = await repo.getByLocation(id);
+    return returnEntity;
+
+  }
   
 }

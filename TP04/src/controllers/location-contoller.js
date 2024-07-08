@@ -25,4 +25,16 @@ router.get('/:id', async (req, res) => {
       return respuesta;
 });
 
+router.get('/:id/event-locations', async (req, res) => {
+  let respuesta;
+  let id = req.params.id;
+  const returnEntity = await svc.getByLocation(id);
+  if (returnEntity != null){
+      respuesta = res.status(200).json(returnEntity);
+    } else {
+      respuesta = res.status(404).send(`not found.`);
+    }
+    return respuesta;
+});
+
 export default router;

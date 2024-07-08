@@ -122,6 +122,28 @@ export default class event_enrollmentsRepository
         rowsAffected = result.affectedRows;
     }
     
+    updateAsync = async (eventId, entity, rating) => {
+        let returnArray = null;
+        const client = new Client(DBConfig);
+    
+        try {
+          await client.connect();
+          const sql = 'UPDATE event_enrollments SET observations = $1, rating = $2 WHERE id_event = $3';
+          const values = [
+            entity.observations, 
+            rating, 
+            eventId
+          ]; 
+          console.log("Executing SQL:", sql);
+          console.log("With values:", values);
+          const result = await client.query(sql, values);
+          await client.end();
+          returnArray = result.rows;
+        } catch (error) {
+          console.log(error);
+        } 
+        return returnArray;
+      }
 }
 
 

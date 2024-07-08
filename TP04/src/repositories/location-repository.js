@@ -10,7 +10,7 @@ export default class LocationRepository
         const client = new Client(DBConfig);
         try {
             await client.connect();
-            const sql = `SELECT * FROM location`;
+            const sql = `SELECT * FROM locations`;
             const result = await client.query(sql);
             await client.end();
             returnArray = result.rows;
@@ -23,7 +23,7 @@ export default class LocationRepository
         const client = new Client(DBConfig);
         await client.connect();
         let returnEntity = null;
-        const sql = `SELECT * FROM location WHERE id = $1`;
+        const sql = `SELECT * FROM locations WHERE id = $1`;
         const values = [id]
         const result = await client.query(sql, values);
         if (result.rows.length > 0){
@@ -31,5 +31,19 @@ export default class LocationRepository
         }
         return  returnEntity;
     }
+
+    getByLocation = async (id) => {
+        const client = new Client(DBConfig);
+        await client.connect();
+        let returnEntity = null;
+        const sql = `SELECT * FROM event_locations WHERE id_location = $1`;
+        const values = [id]
+        const result = await client.query(sql, values);
+        if (result.rows.length > 0){
+            returnEntity = result.rows;
+        }
+        return  returnEntity;
+    }
+    
 
 }

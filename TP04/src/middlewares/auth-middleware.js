@@ -8,6 +8,7 @@ const validateToken = async(req, res, next) => {
     console.log("token", token)
     try {
       let payloadOriginal = await jwt.verify(token, secretKey);
+      req.user = payloadOriginal;
     } catch (error) {
         console.log("error", error)
       return res.status(401).json({ error: 'Token inválido' });

@@ -1,10 +1,11 @@
 import {Router} from 'express';
 import { StatusCodes } from 'http-status-codes';
-import event_locationService from './../services/event_location.js'
+import event_locationService from './../services/event_location.js';
+import AuthMiddleware from "../middlewares/auth-middleware.js";
 const router = Router();
 const svc    = new event_locationService();		// Instanciación del Service.
 
-router.get('', async (req, res) => {
+router.get('', AuthMiddleware.validateToken, async (req, res) => {
   let respuesta;
   const returnArray = await svc.getAllAsync();
   if (returnArray != null){
@@ -14,7 +15,7 @@ router.get('', async (req, res) => {
   }
   return respuesta;
 });
-router.get('/:id', async (req, res) => {
+router.get('/:id',AuthMiddleware.validateToken, async (req, res) => {
     let respuesta;
     let id = req.params.id;
     const returnEntity = await svc.getByIdAsync(id);
@@ -25,20 +26,24 @@ router.get('/:id', async (req, res) => {
       }
       return respuesta;
 });
-router.post('', async (req, res) => {
+router.post('', AuthMiddleware.validateToken, async (req, res) => {
+    let response;
     let entity=req.body;
+    entity.id_creator_user = req.user.id;
     const registrosAfectados = await svc.createAsync(entity);
-    return res.status(200).json(registrosAfectados);
+    response = res.status(201).json(registrosAfectados);
+    return response;
 });
-router.put('', async (req, res) => {
+router.put('', AuthMiddleware.validateToken, async (req, res) => {
     let respuesta;
     let entity=req.body;
+    entity.id_creator_user = req.user.id;
     const returnArray = await svc.updateAsync(entity);
     
       return respuesta = res.status(200).json(returnArray);
     
 });
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', AuthMiddleware.validateToken, async (req, res) => {
     let respuesta;
     let id = req.params.id;
     const returnEntity = await svc.deleteByIdAsync(id);

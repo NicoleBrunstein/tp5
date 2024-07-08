@@ -3,7 +3,7 @@ import event_locationsRepository from "../repositories/event_locations-repositry
 export default class event_locationService {
   // Clase con lógica de negocio.
   getAllAsync = async () => {
-    const repo = new event_locationRepository();
+    const repo = new event_locationsRepository();
     const returnArray = await repo.getAllAsync();
     return returnArray;
   }
@@ -14,18 +14,19 @@ export default class event_locationService {
     return returnEntity;
 
   }
+
   createAsync = async (entity) => {
-    const repo = new event_locationRepository();
+    const repo = new event_locationsRepository();
     const returnrowsAffected = await repo.createAsync(entity);
     return returnrowsAffected;
   }
   updateAsync = async (entity) => {
-    const repo = new event_locationRepository();
+    const repo = new event_locationsRepository();
     const returnrowsAffected = await repo.updateAsync(entity);
     return returnrowsAffected;
   }
   deleteByIdAsync = async (id_location) => {
-    const repo = new event_locationRepository();
+    const repo = new event_locationsRepository();
     const returnrowsAffected = await repo.deleteByIdAsync(id_location);
     return returnrowsAffected;
   }

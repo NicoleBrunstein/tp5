@@ -4,13 +4,13 @@ export default class event_enrollamentsRepository {
   // Clase con lógica de negocio.
 
   createAsync = async (entity) => {
-    const repo = new event_categoriesRepository();
+    const repo = new event_enrollmentsRepository();
     const returnrowsAffected = await repo.createAsync(entity);
     return returnrowsAffected;
   }
   
   deleteByIdAsync = async (id) => {
-    const repo = new event_categoriesRepository();
+    const repo = new event_enrollmentsRepository();
     const returnrowsAffected = await repo.deleteByIdAsync(id);
     return returnrowsAffected;
   }
@@ -18,6 +18,12 @@ export default class event_enrollamentsRepository {
   getByLastName = async (id, first_name, last_name,username, attended, rating) => {
     const repo = new event_enrollmentsRepository();
     const returnArray = await repo.getByLastName(id, first_name, last_name,username, attended, rating);
+    return returnArray;
+  }
+
+  updateAsync = async (eventId, entity, rating) => {
+    const repo = new event_enrollamentsRepository();
+    const returnArray = await repo.updateAsync(eventId, entity, rating);
     return returnArray;
   }
 }

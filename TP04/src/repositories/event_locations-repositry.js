@@ -54,17 +54,18 @@ export default class event_locationsRepository
         const client = new Client(DBConfig);
         await client.connect();
         let rowsAffected;
-            const sql = 'UPDATE event_location SET name = $2, full_address = $3, max_capacity = $4, latitude = $5, longitude = $6, id_creator_user = 7 WHERE id_location = $1';
+            const sql = 'UPDATE event_locations SET name = $2, full_address = $3, max_capacity = $4, latitude = $5, longitude = $6, id_creator_user = $7 WHERE id_location = $1';
             const values = [entity.id_location, entity.name, entity.full_address, entity.max_capacity, entity.latitude, entity.longitude, entity.id_creator_user];
             const result = await client.query(sql, values);
             rowsAffected = result.affectedRows;
             return rowsAffected;
     }
+    
     deleteByIdAsync = async (id_location) => {
         let  rowsAffected;
         const client = new Client(DBConfig);
         await client.connect();
-        const sql = 'DELETE FROM event_location WHERE id_location=$1';
+        const sql = 'DELETE FROM event_locations WHERE id_location=$1';
         const values = [id_location]
         const result = await client.query(sql, values);
         rowsAffected = result.affectedRows;

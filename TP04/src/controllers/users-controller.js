@@ -9,13 +9,9 @@ const svc    = new UsersService();		// Instanciación del Service.
 router.post('/login', async (req, res) => {
     let entity=req.body;
     let respuesta;
-    console.log('Controller: ', entity);
     var validEmail =  /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
     const usuario  = await svc.getByUsername(entity);
-   if(usuario==validEmail)
-   {
-    
-   }
+    console.log(usuario);
     if (usuario == null){
         respuesta = {
             "success": false,
@@ -25,7 +21,7 @@ router.post('/login', async (req, res) => {
         return res.status(404).json(respuesta);
     } else {
         const payload = {
-            id: entity.id,
+            id: usuario.id,
             username:entity.username
         };
         const secretKey = 'clavesecreta2006';
@@ -34,7 +30,6 @@ router.post('/login', async (req, res) => {
             issuer:'mi_organizacion'
         };
         const token = jwt.sign(payload,secretKey,options);
-        console.log(token);
 
         respuesta = {
             "success": true,
