@@ -40,17 +40,18 @@ export default class event_enrollmentsRepository
         }
 
 
-        if(last_name != null ){
+        if(last_name != null && length(last_name)>3){
             indice = values.length + 1;
             sql  =  sql + ` AND lower(users.last_name) like $${indice}`;
             values.push("%" + last_name.toLowerCase()+ "%");
         }
 
-        if(first_name != null ){
+        if(first_name != null && length(first_name)>3 ){
             indice = values.length + 1;
             sql  =  sql + ` AND  lower(users.first_name) like $${indice}`;
             values.push("%" + first_name.toLowerCase()+ "%");
         }
+        
 
         if(username != null ){
             indice = values.length + 1;

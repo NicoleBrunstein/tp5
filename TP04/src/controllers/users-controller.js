@@ -9,13 +9,13 @@ const svc    = new UsersService();		// Instanciación del Service.
 router.post('/login', async (req, res) => {
     let entity=req.body;
     let respuesta;
-    var validEmail =  /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
+   
     const usuario  = await svc.getByUsername(entity);
     console.log(usuario);
     if (usuario == null){
         respuesta = {
             "success": false,
-            "message": "El email es invalido.",
+            "message": "El nombre de usuario es invalido.",
             "token"  : ""
         }
         return res.status(404).json(respuesta);
@@ -41,10 +41,46 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
-    let entity=req.body;
+    var validEmailRegex =  /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
+    const { first_name, last_name, username, password } = req.body;
 
-    const registrosAfectados = await svc.createAsync(entity);
-    return res.status(201).json(registrosAfectados);
+    // Validar first_name y last_name
+    if (!first_name || first_name.length < 3 || !last_name || last_name.length < 3) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            success: false,
+            message: 'Los campos first_name y last_name son requeridos y deben tener al menos tres caracteres.'
+        });
+    }
+
+    // Validar username (email)
+    if (!validEmailRegex.test(username)) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            success: false,
+            message: 'El email (username) es sintácticamente inválido.'
+        });
+    }
+
+    // Validar password
+    if (!password || password.length < 3) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            success: false,
+            message: 'El campo password es requerido y debe tener al menos tres caracteres.'
+        });
+    }
+
+    try {
+        // Crear el usuario si todas las validaciones pasan
+        const registrosAfectados = await svc.createAsync({ first_name, last_name, username, password });
+        
+        // Devolver respuesta exitosa con el código 201 (Created)
+        return res.status(StatusCodes.CREATED).json(registrosAfectados);
+    } catch (error) {
+        console.error('Error en /register:', error);
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: 'Error en el servidor al intentar registrar el usuario.'
+        });
+    }
 });
 export default router;
 
