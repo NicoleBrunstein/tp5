@@ -16,12 +16,12 @@ router.post("/:id/enrollment", AuthMiddleware.validateToken, async (req, res) =>
   let response;
   const entity = req.body;
   const eventId = req.params.id;
-
+  console.log('event xxxxxxxxxxxxxxxxxxxx', event);
   const event = await EventSvc.getByIdAsync(eventId);
   const eventLocation  = await EventLocationSvc.getByIdAsync(event.id_event);
   const eventEnabled = await EventSvc.getAllAsync(eventId);
 
-  console.log('event', event);
+  console.log('event xxxxxxxxxxxxxxxxxxxx', event);
 
   const enrollment = {
     id_event: eventId,
@@ -44,7 +44,9 @@ router.post("/:id/enrollment", AuthMiddleware.validateToken, async (req, res) =>
     console.log("OK");
   }
 
-  if (event.start_date <= new Date()) {
+  console.log('eventLocation', eventLocation)
+  console.log('event', event)
+  if (event.start_date <=  new Date()) {
     return res.status(400).json({ error: "El evento ya ha comenzado o está ocurriendo hoy." });
   }
   if (eventLocation.max_capacity <= event.max_assistance) {
@@ -53,10 +55,10 @@ router.post("/:id/enrollment", AuthMiddleware.validateToken, async (req, res) =>
 
   console.log(enrollment);
 
-  const returnArray = await EventEnrollmentSvc.createAsync(enrollment);
+  const returnValue = await EventEnrollmentSvc.createAsync(enrollment);
 
-  if (returnArray != null) {
-    response = res.status(201).json(returnArray);
+  if (returnValue != 0) {
+    response = res.status(201).json(returnValue);
   } else {
     response = res.status(404).send("ID de evento no encontrado");
   }
@@ -78,22 +80,22 @@ router.delete('/:id', async (req, res) => {
 });
 
 router.get('/:id/enrollment', async (req, res) => {
-    let respuesta;
-    let id = req.params.id;
-    const first_name      = req.query.first_name;
-    const last_name  =  req.query.last_name;
-    const username  =  req.query.username;
-    const attended  =  req.query.attended;
-    const rating  =  req.query.rating;
-  
-    const returnArray = await svc.getByLastName(id, first_name, last_name, username, attended, rating);
-    if (returnArray != null){
-      respuesta = res.status(200).json(returnArray);
-    } else {
-      respuesta = res.status(404).send(`not found`);
-    }
-    return respuesta;
-  });
+  let respuesta;
+  let id = req.params.id;
+  const first_name      = req.query.first_name;
+  const last_name  =  req.query.last_name;
+  const username  =  req.query.username;
+  const attended  =  req.query.attended;
+  const rating  =  req.query.rating;
+
+  const returnArray = await svc.getByLastName(id, first_name, last_name, username, attended, rating);
+  if (returnArray != null){
+    respuesta = res.status(200).json(returnArray);
+  } else {
+    respuesta = res.status(404).send(`not found`);
+  }
+  return respuesta;
+});
 
   router.patch("/:id/enrollment/:num", AuthMiddleware.validateToken, async (req, res) => {
     let response;
@@ -102,46 +104,66 @@ router.get('/:id/enrollment', async (req, res) => {
     const rating = req.params.num; 
   
     const event = await EventSvc.getByIdAsync(eventId);
-  
+    if (!rating || isNaN(rating) || rating < 1 || rating > 10) {
+      return res.status(400).send({ error: 'El rating tiene que ser entre el 1 y 10.' });
+  }
+
+  try {
     if (!event) {
       return res.status(404).json({ error: "Evento no encontrado" });
     }
   
-    if (new Date(event.start_date) < new Date()) {
+    if (new Date(event.start_date) > new Date()) {
       return res.status(400).json({ error: "El evento aún no ha finalizado" });
-  }
-  
-    if (rating < 1 || rating > 10) {
-      return res.status(400).json({ error: "El rating debe estar entre 1 y 10" });
+    }else if (new Date(event.start_date) < new Date()) {
+      return res.status(200).json({ response: "Gracias por comentar" });
     }
-  
-    const enrollment = await EventEnrollmentSvc.updateAsync(eventId, entity, rating); 
+   const enrollment = await EventEnrollmentSvc.updateAsync(eventId, entity, rating); 
   
     if (enrollment != null) {
       response = res.status(200).json(enrollment);
     } else {
       response = res.status(404).send("ID de evento no encontrado");
     }
-    
-    return response;
+  }
+catch (error) {
+  console.error(error); 
+  res.status(500).send({ error: 'Error interno' });
+    return response;}
   });
   
   router.delete("/:id/enrollment", AuthMiddleware.validateToken, async (req, res) => {
-    let response;
-    const eventId = req.params.id;
-  
-    const event = await EventSvc.getByIdAsync(eventId);
-  
-    console.log('event', event);
-  
-    const returnArray = await EventEnrollmentSvc.deleteByIdAsync(eventId);
-  
-    if (returnArray != null || new Date(event.start_date) <= new Date()) {
-      response = res.status(200).json(returnArray);
-    } else {
-      response = res.status(404).send("ID de evento no encontrado");
-    }
-    return response;
+    const enrollmentToEliminate = req.params.id;
+    const userId = req.user.id;
+    try {
+      const evento = await eventsService.getByIdAsync(enrollmentToEliminate); 
+      
+      if (!evento) {
+          return res.status(404).send('No existe el evento');
+      }
+
+      const userReg = await svc.isUserRegistered(evento.id, userId);
+      
+      if (!userReg) {
+          return res.status(401).send('No estás registrado en el evento');
+      }
+
+      const now = new Date().toISOString();
+      
+      if (evento.start_date <= now) {
+          return res.status(400).send('El evento ya pasó o es hoy');
+      }
+      
+      if (evento.enabled_for_enrollment <= 0) {
+          return res.status(400).send('El evento no se encuentra habilitado para la inscripción');
+      }
+
+      const rowsAffected = await svc.deleteAsync(enrollmentToEliminate);
+      return res.status(200).json(rowsAffected);
+      
+  } catch (error) {
+      return res.status(500).send('Error interno del servidor');
+  }
   });
 
 export default router;

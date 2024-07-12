@@ -7,38 +7,36 @@ const svc    = new UsersService();		// Instanciación del Service.
 
 
 router.post('/login', async (req, res) => {
-    let entity=req.body;
-    let respuesta;
-   
-    const usuario  = await svc.getByUsername(entity);
-    console.log(usuario);
-    if (usuario == null){
-        respuesta = {
-            "success": false,
-            "message": "El nombre de usuario es invalido.",
-            "token"  : ""
-        }
-        return res.status(404).json(respuesta);
-    } else {
-        const payload = {
-            id: usuario.id,
-            username:entity.username
-        };
-        const secretKey = 'clavesecreta2006';
-        const options ={
-            expiresIn: '1h',
-            issuer:'mi_organizacion'
-        };
-        const token = jwt.sign(payload,secretKey,options);
+    let response;
+    const userData = req.body
+    console.log('controller login' , userData);
+    const returnEntity = await svc.getByUsername(userData);
+    console.log('controller despues del login' , returnEntity);
+    if (returnEntity !=null){
+        const secretKey = 'clavesecreta2006'
 
-        respuesta = {
+        const options = {
+            expiresIn: '1h',
+            issuer: 'ORT ' 
+        };
+
+        const token = jwt.sign(returnEntity, secretKey, options);
+        
+        response = res.status(200).json({
             "success": true,
             "message": "",
             "token"  : token
-        }
+        });
+
+    } else {
+        response=res.status(401).send({
+            "success": false,
+            "message": "Usuario o clave inválida.",
+            "token"  : ""
+         });
     }
-    return res.status(200).json(respuesta);
-});
+    return response;
+})
 
 router.post('/register', async (req, res) => {
     var validEmailRegex =  /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;

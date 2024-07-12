@@ -24,65 +24,117 @@ export default class eventsRepository
     
     getByAsync = async (name, category, tags, startDate) => {
         const client = new Client(DBConfig);
-        await client.connect();
-        let returnEntity = null;
-        let values = [];
-        let indice;
-        let  sql = `SELECT * FROM public.events
-        INNER JOIN public.event_categories ON events.id_event_category = event_categories.id
-        LEFT JOIN public.event_tags ON events.id = event_tags.id_event
-        LEFT JOIN public.tags on event_tags.id_tag = tags.id
-        WHERE 1=1 `;
-        
-
-        if(name != null ){
-            indice = values.length + 1;
-            sql  =  sql + `AND lower(events.name) like $${indice}`;
-            values.push("%" + name.toLowerCase()+ "%");
+        let returnArray = null;
+        try {
+            await client.connect();
+            let sql =  `SELECT 
+            e.id, 
+            e.name, 
+            e.description, 
+            e.id_event_category,
+            json_build_object( 
+                'id',            ec.id, 
+                'name',          ec.name, 
+                'display_order', ec.display_order
+            ) AS ec,
+            e.id_event_location,
+            json_build_object(
+                'id',            el.id, 
+                'id_location',   el.id_location, 
+                'location',      json_build_object(
+                    'id',            l.id,
+                    'name',          l.name,
+                    'id_province',   l.id_province,
+                    'province',      json_build_object(
+                        'id',            pr.id,
+                        'name',          pr.name,
+                        'full_name',     pr.full_name,
+                        'latitude',      pr.latitude, 
+                        'longitude',     pr.longitude,
+                        'display_order', pr.display_order
+                    ),
+                    'latitude',      l.latitude,
+                    'longitude',     l.longitude
+                ),
+                'name',           el.name,
+                'full_address',   el.full_address,
+                'max_capacity',   el.max_capacity,
+                'latitude',       el.latitude, 
+                'longitude',      el.longitude,
+                'id_creator_user',el.id_creator_user
+            ) AS el,
+            e.start_date, 
+            e.duration_in_minutes, 
+            e.price, 
+            e.enabled_for_enrollment, 
+            e.max_assistance, 
+            e.id_creator_user,
+            json_build_object(
+                'id',            u.id,
+                'first_name',    u.first_name,
+                'last_name',     u.last_name,
+                'username',      u.username,
+                'password',      u.password
+            ) AS creator_user,
+            ARRAY(
+                SELECT 
+                    json_build_object(
+                        'id',   t.id,
+                        'name', t.name
+                    ) 
+                FROM tags t 
+                INNER JOIN event_tags et ON t.id = et.id_tag
+                WHERE et.id_event = e.id
+            ) AS t
+        FROM public.events e
+        LEFT JOIN public.event_categories ec ON e.id_event_category = ec.id
+        LEFT JOIN public.event_locations el ON e.id_event_location = el.id
+        LEFT JOIN public.locations l ON el.id_location = l.id
+        LEFT JOIN public.provinces pr ON l.id_province = pr.id
+        LEFT JOIN public.users u ON e.id_creator_user = u.id
+        WHERE 1=1
+        `; 
+    
+            if (name!=null){
+                sql += `AND lower(e.name) LIKE lower('%${name}%') `; 
+            }
+            if (category!=null){
+                sql += `AND lower(ec.name) LIKE lower('%${category}%') `; 
+            }
+            if (tags!=null){
+                sql += `AND lower(t.name) LIKE lower('%${tags}%') `;
+            }
+            if (startDate!=null){
+                 sql += `AND e.start_date = '${startDate}' `;
+             }
+    
+            // Sacamos el and del final
+            
+            let result = await client.query(sql);
+            returnArray = result.rows;
+    
+        } catch (error){
+            console.log(error);
+        } finally {
+            await client.end();
         }
-         
-        if(category != null ){
-            indice = values.length + 1;
-            sql  =  sql + `AND lower(event_categories.name) like $${indice}`;
-            values.push("%" + category.toLowerCase()+ "%");
-        }
-
-
-        if(tags != null ){
-            indice = values.length + 1;
-            sql  =  sql + `AND lower(tags.name) like $${indice}`;
-            values.push("%" + tags.toLowerCase()+ "%");
-        }
-       
-
-        if(startDate != null ){
-            indice = values.length + 1;
-            sql  =  sql + `AND events.start_date = $${indice}`;
-            values.push("%" + startDate.toLowerCase()+ "%");
-        }
-         
-        console.log(sql)
-        console.log('values', values)
-        console.log('indice', indice)
-        const result = await client.query(sql, values);
-        if (result.rows.length > 0){
-            returnEntity = result.rows;
-        }
-        return  returnEntity;
+        //console.log(returnArray)
+        return returnArray;
     }
 
-    getByIdAsync = async (id) => {
-        const client = new Client(DBConfig);
-        await client.connect();
-        let returnEntity = null;
-        const sql = `SELECT * FROM events WHERE id = $1`;
-        const values = [id]
-        const result = await client.query(sql, values);
-        if (result.rows.length > 0){
-            returnEntity = result.rows[0];
-        }
-        return  returnEntity;
+
+  getByIdAsync = async (id) => {
+    const client = new Client(DBConfig);
+    await client.connect();
+    let returnEntity = null;
+    const sql = `SELECT * FROM events WHERE id = $1`;
+    const values = [id]
+    const result = await client.query(sql, values);
+    if (result.rows.length > 0){
+        returnEntity = result.rows[0];
     }
+    return  returnEntity;
+}
     createAsync = async (entity) => {
         console.log('event_categoriesRepository.createAsync(${JSON.stringify(entity)})');
         const client = new Client(DBConfig);
@@ -123,26 +175,26 @@ export default class eventsRepository
         return returnArray;
       }
     
-      deleteAsync = async(id) => {
-        let returnArray = null;
+      deleteAsync = async(eventToEliminate) => {
+        let returnValue = null;
         const client = new Client(DBConfig);
-    
+        
         try {
-          await client.connect();
-          const sql = "DELETE FROM events WHERE id = $1";
-          const values = [id];
-          console.log("Executing SQL:", sql);
-          console.log("With values:", values);
-    
-          const result = await client.query(sql, values);
-          await client.end();
-          returnArray = result.rows;
-        } catch (error) {
-          console.log("Error in deleteAsync:", error);
+            await client.connect();
+            let sql = 'DELETE from events WHERE id=$1'; // Array con los valores. 
+            const values = [eventToEliminate];
+
+            const output = await client.query(sql, values); 
+            return output.rowCount;
+            
+        } catch (error){
+            console.log('error', error);
         }
+        return returnValue;
     
-        return returnArray;
-      }
+    }
+
+      
 
       registrationAsync = async(id) => {
         let returnArray = null;
@@ -160,7 +212,8 @@ export default class eventsRepository
           returnArray = result.rows[0].count > 0;
         } catch (error) {
           console.log("Error in registrationAsync:", error);
-        }
-        return returnArray;
-    }
+        }   return returnArray;
+ }
 }
+
+

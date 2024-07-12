@@ -10,7 +10,7 @@ import AuthMiddleware from "../middlewares/auth-middleware.js";
 router.post('', AuthMiddleware.validateToken, async (req, res) => {
   let response;
   const entity = req.body;
-
+  console.log("CREACION DE EVENTO");
   let eventCapacity = await svc.getByIdAsync(entity.id_event_location);
 
   if (!entity.name || typeof entity.name !== 'string' || entity.name.length < 3) {
@@ -89,7 +89,7 @@ router.put('', AuthMiddleware.validateToken, async (req, res) => {
     return res.status(400).json({ error: "El nombre es inválido." });
   }
   if (!entity.description || typeof entity.description !== 'string' || entity.description.length < 3) {
-    return res.status(400).json({ error: "La descripción es inválida." });
+    return res.status(404).json({ error: "La descripción es inválida." });
   }
   if (!entity.id_event_category || isNaN(entity.id_event_category)) {
     return res.status(400).json({ error: "La categoría del evento es inválida." });
@@ -125,15 +125,22 @@ router.put('', AuthMiddleware.validateToken, async (req, res) => {
 
 router.delete('/:id', AuthMiddleware.validateToken, async (req, res) => {
   let response;
-  const element = req.params.id;
+  const eventToEliminate = req.params.id;
 
-  const returnArray = await EventSvc.deleteAsync(element);
+  const returnEntity = await EventSvc.deleteAsync(eventToEliminate);
 
-  if (returnArray != null) {
-    response = res.status(200).json(returnArray);
-  } else {
-    response = res.status(404).send('Evento no encontrado');
-  }
+  if (returnEntity.id_creator_user = req.user.id){
+
+    if (returnEntity != null){
+        const rowsAffected =await svc.deleteEvent(eventToEliminate);
+        response = res.status(200).json(rowsAffected);
+    }else{
+        response=res.status(404).send(`not found`);
+    }
+
+}else{
+    response=res.status(404).send(`not found`);
+}
   return response;
 });
 
