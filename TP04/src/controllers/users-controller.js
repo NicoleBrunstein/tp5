@@ -66,12 +66,19 @@ router.post('/register', async (req, res) => {
         });
     }
 
+    console.log("NACA!!")
+
     try {
         // Crear el usuario si todas las validaciones pasan
         const registrosAfectados = await svc.createAsync({ first_name, last_name, username, password });
         
         // Devolver respuesta exitosa con el código 201 (Created)
-        return res.status(StatusCodes.CREATED).json(registrosAfectados);
+        console.log("llego")
+
+        return res.status(StatusCodes.CREATED).json({
+            success: true,
+            message: ''
+        });
     } catch (error) {
         console.error('Error en /register:', error);
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
