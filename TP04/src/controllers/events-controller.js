@@ -72,7 +72,8 @@ console.log("name:", name)
 router.get('/:id', async (req, res) => {
     let respuesta;
     let id = req.params.id;
-    const returnEntity = await svc.getByIdAsync(id);
+    console.log(id)
+    const returnEntity = await EventSvc.getByIdAsync(id);
     if (returnEntity != null){
         respuesta = res.status(200).json(returnEntity);
       } else {
