@@ -156,6 +156,70 @@ export default class event_enrollmentsRepository
             throw error;
         }
     }
+
+    getByEventId = async (id_evento, first_name, last_name, username, attended, rating) => {
+        let returnArray = null;
+        const client = new Client(DBConfig);
+        let values = [];
+    
+        try {
+            await client.connect();
+            let query = `
+            SELECT 
+                ee.id_event, 
+                u.first_name, 
+                u.last_name, 
+                u.username, 
+                ee.attended, 
+                ee.rating 
+            FROM 
+                users AS u 
+            INNER JOIN 
+                event_enrollments AS ee 
+            ON 
+                ee.id_user = u.id
+            WHERE 
+                ee.id_event = $1`;
+    
+            const params = [];
+            let cont = 1;
+            values.push(id_evento);
+    
+            if (first_name) {
+                params.push(`lower(u.first_name) = lower($${++cont})`);
+                values.push(first_name);
+            }
+            if (last_name) {
+                params.push(`lower(u.last_name) = lower($${++cont})`);
+                values.push(last_name);
+            }
+            if (username) {
+                params.push(`lower(u.username) = lower($${++cont})`);
+                values.push(username);
+            }
+            if (attended !== undefined) {
+                params.push(`ee.attended = $${++cont}`);
+                values.push(attended);
+            }
+            if (rating !== undefined) {
+                params.push(`ee.rating = $${++cont}`);
+                values.push(rating);
+            }
+    
+            if (params.length > 0) {
+                query += ' AND ' + params.join(' AND ');
+            }
+    
+            const result = await client.query(query, values);
+            returnArray = result.rows;
+        } catch (error) {
+            console.error(error);
+        } finally {
+            await client.end();
+        }
+    
+        return returnArray;
+    }
 }
 
 

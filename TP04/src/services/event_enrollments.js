@@ -26,4 +26,16 @@ export default class event_enrollamentsRepository {
     const returnArray = await repo.updateAsync(eventId, entity, rating);
     return returnArray;
   }
+
+  getByEventId = async (id_event, first_name, last_name, username, attended, rating) => {
+    const repo = new event_enrollmentsRepository();
+    const response = await repo.getByEventId(id_event, first_name, last_name, username, attended, rating);
+    if (response === null) {
+        return [{ success: false, message: 'No existe un evento con ese ID' }, 404];
+    }
+    
+    return response.length > 0
+        ? [{ success: true, response: response }, 200]
+        : [{ success: false, message: 'No existe un evento con ese ID' }, 404];
+}
 }

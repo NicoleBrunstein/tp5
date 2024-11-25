@@ -80,21 +80,25 @@ router.delete('/:id', async (req, res) => {
 });
 
 router.get('/:id/enrollment', async (req, res) => {
-  let respuesta;
-  let id = req.params.id;
-  const first_name      = req.query.first_name;
-  const last_name  =  req.query.last_name;
-  const username  =  req.query.username;
-  const attended  =  req.query.attended;
-  const rating  =  req.query.rating;
+  let first_name = req.query.first_name;
+  let id_event = req.params.id;
+  let last_name = req.query.last_name;
+  let username = req.query.username;
+  let attended = req.query.attended;
+  let rating = req.query.rating;
 
-  const returnArray = await svc.getByLastName(id, first_name, last_name, username, attended, rating);
-  if (returnArray != null){
-    respuesta = res.status(200).json(returnArray);
-  } else {
-    respuesta = res.status(404).send(`not found`);
+  try {
+      const response = await svc.getByEventId(id_event, first_name, last_name, username, attended, rating);
+
+      if (response !== null && response.length > 0) {
+          res.status(200).json({ success: true, response });
+      } else {
+          res.status(404).json({ success: false, message: 'No existe un evento con ese ID' });
+      }
+  } catch (error) {
+      console.error('Error en el manejo de la ruta:', error);
+      res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
-  return respuesta;
 });
 
   router.patch("/:id/enrollment/:num", AuthMiddleware.validateToken, async (req, res) => {
